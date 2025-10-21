@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../models/task.dart';
 import '../services/database_service.dart';
 import '../widgets/task_card.dart';
@@ -120,10 +121,28 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   Future<void> _openTaskForm([Task? task]) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TaskFormScreen(task: task),
+    final result = await Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => 
+            TaskFormScreen(task: task),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          
+          var tween = Tween(begin: begin, end: end).chain(
+            CurveTween(curve: curve),
+          );
+          
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
 
@@ -295,18 +314,29 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     ? _buildEmptyState()
                     : RefreshIndicator(
                         onRefresh: _loadTasks,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 80),
-                          itemCount: filteredTasks.length,
-                          itemBuilder: (context, index) {
-                            final task = filteredTasks[index];
-                            return TaskCard(
-                              task: task,
-                              onTap: () => _openTaskForm(task),
-                              onToggle: () => _toggleTask(task),
-                              onDelete: () => _deleteTask(task),
-                            );
-                          },
+                        child: AnimationLimiter(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 80),
+                            itemCount: filteredTasks.length,
+                            itemBuilder: (context, index) {
+                              final task = filteredTasks[index];
+                              return AnimationConfiguration.staggeredList(
+                                position: index,
+                                duration: const Duration(milliseconds: 375),
+                                child: SlideAnimation(
+                                  verticalOffset: 50.0,
+                                  child: FadeInAnimation(
+                                    child: TaskCard(
+                                      task: task,
+                                      onTap: () => _openTaskForm(task),
+                                      onToggle: () => _toggleTask(task),
+                                      onDelete: () => _deleteTask(task),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
           ),
@@ -317,8 +347,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
         onPressed: () => _openTaskForm(),
         icon: const Icon(Icons.add),
         label: const Text('Nova Tarefa'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 6,
+        highlightElevation: 12,
       ),
     );
   }
