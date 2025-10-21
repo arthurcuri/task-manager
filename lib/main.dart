@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/task_list_screen.dart';
 
@@ -34,6 +35,18 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Task Manager Pro',
       debugShowCheckedModeBanner: false,
+
+      // Localizações necessárias para DatePicker
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'), // Português Brasil
+        Locale('en', 'US'), // Inglês
+      ],
+      locale: const Locale('pt', 'BR'), // Idioma padrão
 
       // Tema Claro - MELHORADO COM CONTRASTE
       theme: ThemeData(
