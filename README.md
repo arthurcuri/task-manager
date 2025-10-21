@@ -13,7 +13,7 @@
 ## Demonstração em Vídeo
 
 <div align="center">
-  <img src="entregaveis/demo.gif" alt="Demonstração do Task Manager" width="350" />
+  <img src="entregaveis/gif/demo.gif" alt="Demonstração do Task Manager" width="350" />
   <p><em>Demo completo do aplicativo mostrando funcionalidades principais</em></p>
 </div>
 
