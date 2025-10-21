@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/task.dart';
+import '../models/category.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -56,10 +57,31 @@ class TaskCard extends StatelessWidget {
     }
   }
 
+  bool _isOverdue() {
+    if (task.completed) return false;
+    if (task.dueDate == null) return false;
+    return task.dueDate!.isBefore(DateTime.now());
+  }
+
+  Color _getCardBorderColor() {
+    // Se vencida, usa vermelho
+    if (_isOverdue()) return Colors.red;
+    
+    // Se tem categoria, usa a cor da categoria
+    final category = AppCategories.getById(task.category);
+    if (category != null) return category.color;
+    
+    // Senão, usa cor da prioridade
+    return _getPriorityColor();
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+    final dueDateFormat = DateFormat('dd/MM/yyyy');
     final priorityColor = _getPriorityColor();
+    final category = AppCategories.getById(task.category);
+    final isOverdue = _isOverdue();
     
     return Semantics(
       label: '${task.completed ? "Concluída" : "Pendente"}: ${task.title}. Prioridade ${_getPriorityLabel()}',
@@ -107,14 +129,17 @@ class TaskCard extends StatelessWidget {
         ),
         
         child: Card(
-          elevation: task.completed ? 1 : 3,
+          elevation: task.completed ? 1 : (isOverdue ? 6 : 3),
+          color: isOverdue && !task.completed
+              ? Colors.red.withValues(alpha: 0.05)
+              : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: task.completed
                   ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
-                  : priorityColor.withValues(alpha: 0.5),
-              width: 2,
+                  : _getCardBorderColor().withValues(alpha: 0.7),
+              width: isOverdue && !task.completed ? 3 : 2,
             ),
           ),
           child: InkWell(
@@ -183,6 +208,42 @@ class TaskCard extends StatelessWidget {
                           spacing: 12,
                           runSpacing: 8,
                           children: [
+                            // Categoria (se tiver)
+                            if (category != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: category.color.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: category.color.withValues(alpha: 0.5),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      category.icon,
+                                      size: 16,
+                                      color: category.color,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      category.name,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: category.color,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            
                             // Prioridade Badge
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -218,7 +279,58 @@ class TaskCard extends StatelessWidget {
                               ),
                             ),
                             
-                            // Data
+                            // Data de Vencimento (se tiver)
+                            if (task.dueDate != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isOverdue
+                                      ? Colors.red.withValues(alpha: 0.15)
+                                      : Colors.blue.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isOverdue
+                                        ? Colors.red.withValues(alpha: 0.5)
+                                        : Colors.blue.withValues(alpha: 0.5),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isOverdue ? Icons.warning : Icons.event,
+                                      size: 16,
+                                      color: isOverdue ? Colors.red : Colors.blue,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      dueDateFormat.format(task.dueDate!),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: isOverdue ? Colors.red : Colors.blue,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    if (isOverdue) ...[
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        'VENCIDA',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            
+                            // Data de Criação
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [

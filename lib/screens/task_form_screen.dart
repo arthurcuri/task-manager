@@ -61,6 +61,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           description: _descriptionController.text.trim(),
           priority: _priority,
           completed: _completed,
+          dueDate: _dueDate,
+          category: _category,
         );
         await DatabaseService.instance.create(newTask);
         
@@ -80,6 +82,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           description: _descriptionController.text.trim(),
           priority: _priority,
           completed: _completed,
+          dueDate: _dueDate,
+          category: _category,
         );
         await DatabaseService.instance.update(updatedTask);
         
@@ -227,6 +231,71 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                         if (value != null) {
                           setState(() => _priority = value);
                         }
+                      },
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Data de Vencimento
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.calendar_today),
+                        title: const Text('Data de Vencimento'),
+                        subtitle: Text(
+                          _dueDate != null
+                              ? DateFormat('dd/MM/yyyy').format(_dueDate!)
+                              : 'Nenhuma data selecionada',
+                        ),
+                        trailing: _dueDate != null
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() => _dueDate = null);
+                                },
+                                tooltip: 'Remover data',
+                              )
+                            : null,
+                        onTap: () async {
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: _dueDate ?? DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                            locale: const Locale('pt', 'BR'),
+                          );
+                          
+                          if (pickedDate != null) {
+                            setState(() => _dueDate = pickedDate);
+                          }
+                        },
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Categoria
+                    DropdownButtonFormField<String>(
+                      initialValue: _category,
+                      decoration: const InputDecoration(
+                        labelText: 'Categoria',
+                        prefixIcon: Icon(Icons.category),
+                        border: OutlineInputBorder(),
+                      ),
+                      hint: const Text('Selecione uma categoria'),
+                      items: AppCategories.all.map((cat) {
+                        return DropdownMenuItem(
+                          value: cat.id,
+                          child: Row(
+                            children: [
+                              Icon(cat.icon, color: cat.color, size: 20),
+                              const SizedBox(width: 12),
+                              Text(cat.name),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() => _category = value);
                       },
                     ),
                     

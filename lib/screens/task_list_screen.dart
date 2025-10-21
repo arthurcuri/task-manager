@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../models/task.dart';
+import '../models/category.dart';
 import '../services/database_service.dart';
 import '../widgets/task_card.dart';
 import 'task_form_screen.dart';
@@ -21,9 +22,10 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   List<Task> _tasks = [];
-  String _filter = 'all'; // all, completed, pending
+  String _filter = 'all'; // all, completed, pending, overdue
   String _searchQuery = '';
-  String _sortBy = 'date'; // date, priority, title
+  String _sortBy = 'date'; // date, priority, title, dueDate
+  String? _categoryFilter; // null = todas as categorias
   bool _isLoading = false;
 
   @override
@@ -42,12 +44,24 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   List<Task> get _filteredTasks {
+    final now = DateTime.now();
+    
     // Filtra por status primeiro
     var tasks = switch (_filter) {
       'completed' => _tasks.where((t) => t.completed).toList(),
       'pending' => _tasks.where((t) => !t.completed).toList(),
+      'overdue' => _tasks.where((t) {
+          if (t.completed) return false;
+          if (t.dueDate == null) return false;
+          return t.dueDate!.isBefore(now);
+        }).toList(),
       _ => List<Task>.from(_tasks),
     };
+
+    // Filtro por categoria
+    if (_categoryFilter != null) {
+      tasks = tasks.where((t) => t.category == _categoryFilter).toList();
+    }
 
     // Filtro por busca
     if (_searchQuery.isNotEmpty) {
@@ -69,6 +83,15 @@ class _TaskListScreenState extends State<TaskListScreen> {
         break;
       case 'title':
         tasks.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case 'dueDate':
+        tasks.sort((a, b) {
+          // Tarefas sem data vão para o final
+          if (a.dueDate == null && b.dueDate == null) return 0;
+          if (a.dueDate == null) return 1;
+          if (b.dueDate == null) return -1;
+          return a.dueDate!.compareTo(b.dueDate!);
+        });
         break;
       case 'date':
       default:
@@ -179,16 +202,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
             tooltip: 'Ordenar',
             onSelected: (value) => setState(() => _sortBy = value),
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'date', child: Text('Ordenar por Data')),
+              const PopupMenuItem(value: 'date', child: Text('Ordenar por Data de Criação')),
+              const PopupMenuItem(value: 'dueDate', child: Text('Ordenar por Vencimento')),
               const PopupMenuItem(value: 'priority', child: Text('Ordenar por Prioridade')),
               const PopupMenuItem(value: 'title', child: Text('Ordenar por Título')),
             ],
           ),
 
-          // Filtro
+          // Filtro por Status
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list),
-            tooltip: 'Filtrar',
+            tooltip: 'Filtrar por Status',
             onSelected: (value) => setState(() => _filter = value),
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -221,6 +245,52 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   ],
                 ),
               ),
+              const PopupMenuItem(
+                value: 'overdue',
+                child: Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Vencidas'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          // Filtro por Categoria
+          PopupMenuButton<String?>(
+            icon: Icon(
+              Icons.category,
+              color: _categoryFilter != null 
+                  ? Theme.of(context).colorScheme.primary 
+                  : null,
+            ),
+            tooltip: 'Filtrar por Categoria',
+            onSelected: (value) => setState(() => _categoryFilter = value),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: null,
+                child: Row(
+                  children: [
+                    Icon(Icons.clear_all),
+                    SizedBox(width: 8),
+                    Text('Todas as categorias'),
+                  ],
+                ),
+              ),
+              ...AppCategories.all.map((cat) {
+                return PopupMenuItem(
+                  value: cat.id,
+                  child: Row(
+                    children: [
+                      Icon(cat.icon, color: cat.color, size: 20),
+                      const SizedBox(width: 8),
+                      Text(cat.name),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
         ],
