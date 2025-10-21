@@ -10,6 +10,15 @@
 
 ---
 
+## Demonstração em Vídeo
+
+<div align="center">
+  <img src="entregaveis/demo.gif" alt="Demonstração do Aplicativo" width="300" />
+  <p><em>Coloque aqui o GIF de demonstração do aplicativo</em></p>
+</div>
+
+---
+
 ## Descrição
 
 Aplicativo de gerenciamento de tarefas desenvolvido em Flutter com interface moderna seguindo Material Design 3, banco de dados SQLite local, sistema de categorias, datas de vencimento, filtros avançados e tema claro/escuro. Projeto desenvolvido como atividade prática para o Laboratório de Desenvolvimento de Aplicações Móveis e Distribuídas na PUC Minas.
@@ -482,7 +491,53 @@ CREATE TABLE tasks (
 
 ## Screenshots
 
-*Capturas de tela serão adicionadas após gravação da demonstração em vídeo*
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-45-17.png" alt="Tela Principal - Lista de Tarefas" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-45-22.png" alt="Seleção de Categoria" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-45-34.png" alt="Formulário de Nova Tarefa" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-45-46.png" alt="DatePicker - Seleção de Data" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-45-51.png" alt="Tarefa com Data de Vencimento" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-49-29.png" alt="Menu de Filtros" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-49-52.png" alt="Filtro de Tarefas Vencidas" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-50-11.png" alt="Menu de Ordenação" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-50-16.png" alt="Lista Ordenada" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-50-56.png" alt="Diálogo de Exclusão" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-51-22.png" alt="Modo Escuro" width="300" />
+</div>
+
+<div align="center">
+  <img src="entregaveis/screenshots/Captura de tela de 2025-10-21 00-51-37.png" alt="Lista Vazia" width="300" />
+</div>
 
 ---
 
