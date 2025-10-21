@@ -545,7 +545,7 @@ CREATE TABLE tasks (
 
 Desenvolvido por **Arthur Kramberger** para PUC Minas — ICEI  
 Disciplina: Laboratório de Desenvolvimento de Aplicações Móveis e Distribuídas  
-Professor: [Nome do Professor]
+Professor: Cleiton Silva Tavares
 
 ---
 
@@ -563,3 +563,4 @@ Professor: [Nome do Professor]
 ## Licença
 
 Este projeto foi desenvolvido para fins educacionais como parte do curso de Engenharia de Software da PUC Minas.
+
