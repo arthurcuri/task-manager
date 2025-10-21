@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../../models/task.dart';
+import 'package:path_provider/path_provider.dart';
+import '../models/task.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -15,7 +17,17 @@ class DatabaseService {
   }
 
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
+    String dbPath;
+    
+    // Em plataformas desktop, usa o diretório de documentos da aplicação
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      final directory = await getApplicationDocumentsDirectory();
+      dbPath = directory.path;
+    } else {
+      // Em Android/iOS usa o path padrão do sqflite
+      dbPath = await getDatabasesPath();
+    }
+    
     final path = join(dbPath, filePath);
 
     return await openDatabase(path, version: 1, onCreate: _createDB);
